@@ -1,0 +1,23 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    name: hr-inventory
+
+server:
+  port: 8088
+
+jwt:
+  secret_key: ${JWT_SECRET_KEY}
+  expires_in_ms: 900000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  level:
+    root: INFO
+    com.mcyldz.hrinventory: DEBUG
