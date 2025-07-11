@@ -40,7 +40,7 @@ public class Personnel extends BaseEntity{
     private MaritalStatus maritalStatus;
 
     @Column(name = "is_active", nullable = false)
-    private boolean isActive = true;
+    private Boolean isActive = true;
 
     @Lob
     @Column(name = "profile_photo", columnDefinition = "BYTEA")

@@ -23,7 +23,7 @@ public class User extends BaseEntity{
     private String password;
 
     @Column(name = "is_active", nullable = false)
-    private boolean isActive = true;
+    private Boolean isActive = true;
 
     @Column(name = "last_login")
     private LocalDateTime lastLogin;
