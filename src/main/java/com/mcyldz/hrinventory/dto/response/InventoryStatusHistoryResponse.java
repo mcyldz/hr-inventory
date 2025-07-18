@@ -26,5 +26,5 @@ public class InventoryStatusHistoryResponse {
 
     private String statusName;
 
-    private String changedByUserName;
+    private String changedByUsername;
 }
