@@ -24,7 +24,4 @@ public class InventoryCreateRequest {
 
     @NotNull(message = "Inventory type ID cannot be null")
     private UUID inventoryTypeId;
-
-    @NotNull(message = "Initial status ID cannot be null")
-    private UUID statusId;
 }

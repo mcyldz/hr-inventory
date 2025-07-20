@@ -1,6 +1,7 @@
 package com.mcyldz.hrinventory.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -15,12 +16,12 @@ public class InventoryUpdateRequest {
     @NotBlank(message = "Model cannot be blank")
     private String model;
 
-    @NotBlank(message = "Entry date cannot be null")
+    @NotNull(message = "Entry date cannot be null")
     private LocalDate entryDate;
 
-    @NotBlank(message = "Inventory type ID cannot be null")
-    private UUID inventoryId;
+    @NotNull(message = "Inventory type ID cannot be null")
+    private UUID inventoryTypeId;
 
-    @NotBlank(message = "Inventory status ID cannot be null")
+    @NotNull(message = "Inventory status ID cannot be null")
     private UUID currentStatusId;
 }

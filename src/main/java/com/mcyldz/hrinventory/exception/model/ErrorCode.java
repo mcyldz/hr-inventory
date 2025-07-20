@@ -20,7 +20,8 @@ public enum ErrorCode {
 
     USERNAME_ALREADY_EXISTS("ERR-409-1", "Bu kullanıcı adı zaten kullanılıyor."),
     TCKN_ALREADY_EXISTS("ERR-409-2", "Bu T.C. Kimlik Numarası zaten kayıtlı."),
-    SERIAL_NUMBER_ALREADY_EXISTS("ERR-409-3", "Bu seri numarası zaten kayıtlı.");
+    SERIAL_NUMBER_ALREADY_EXISTS("ERR-409-3", "Bu seri numarası zaten kayıtlı."),
+    ROLE_NAME_ALREADY_EXISTS("ERR-409-4", "Bu rol zaten kayıtlı.");
 
     private final String code;
     private final String defaultMessage;

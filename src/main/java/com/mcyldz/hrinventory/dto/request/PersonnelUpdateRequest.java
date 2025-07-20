@@ -29,7 +29,7 @@ public class PersonnelUpdateRequest {
     @Past(message = "Birth date must be in the past")
     private LocalDate birthDate;
 
-    @NotBlank(message = "Marital status cannot be blank")
+    @NotNull(message = "Marital status cannot be blank")
     private MaritalStatus maritalStatus;
 
     @NotNull(message = "Department ID cannot be null")

@@ -1,5 +1,6 @@
 package com.mcyldz.hrinventory.dto.request;
 
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -13,7 +14,7 @@ public class AssignmentCreateRequest {
     @NotNull(message = "Personnel ID cannot be null")
     private UUID personnelId;
 
-    @NotNull(message = "Inventory item ID list cannot be null")
+    @NotEmpty(message = "Inventory item ID list cannot be null")
     private List<UUID> inventoryItemIds;
 
     @NotNull(message = "Assignment date cannot be null")

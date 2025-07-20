@@ -1,7 +1,6 @@
 package com.mcyldz.hrinventory.dto.request;
 
 import com.mcyldz.hrinventory.entity.*;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
@@ -9,6 +8,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Data
 public class PersonnelCreateRequest {
@@ -35,13 +35,11 @@ public class PersonnelCreateRequest {
     @NotNull(message = "Marital status cannot be null")
     private MaritalStatus maritalStatus;
 
-    private byte[] profilePhoto;
-
-    private EducationLevel educationLevel;
-
     @NotNull(message = "Department ID cannot be null")
-    private Department department;
+    private UUID departmentId;
 
     @NotNull(message = "Position ID cannot be null")
-    private Position position;
+    private UUID positionId;
+
+    private UUID educationLevelId;
 }
