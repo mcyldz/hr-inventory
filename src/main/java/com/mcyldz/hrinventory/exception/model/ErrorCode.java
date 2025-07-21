@@ -17,6 +17,11 @@ public enum ErrorCode {
     ROLE_NOT_FOUND("ERR-404-3", "Belirtilen ID'ye sahip rol bulunamadı."),
     PERSONNEL_NOT_FOUND("ERR-404-4", "Belirtilen ID'ye sahip personel bulunamadı."),
     INVENTORY_ITEM_NOT_FOUND("ERR-404-5", "Belirtilen ID'ye sahip envanter bulunamadı."),
+    ASSIGNMENT_NOT_FOUND("ERR-404-6", "Assignment record not found for the given identifier."),
+    DEPARTMENT_NOT_FOUND("ERR-404-7", "Department not found for the given identifier."),
+    POSITION_NOT_FOUND("ERR-404-8", "Position not found for the given identifier."),
+    EDUCATION_LEVEL_NOT_FOUND("ERR-404-9", "Education level not found for the given identifier."),
+
 
     USERNAME_ALREADY_EXISTS("ERR-409-1", "Bu kullanıcı adı zaten kullanılıyor."),
     TCKN_ALREADY_EXISTS("ERR-409-2", "Bu T.C. Kimlik Numarası zaten kayıtlı."),
