@@ -4,6 +4,7 @@ import com.mcyldz.hrinventory.dto.request.InventoryCreateRequest;
 import com.mcyldz.hrinventory.dto.request.InventoryUpdateRequest;
 import com.mcyldz.hrinventory.dto.response.ApiResponse;
 import com.mcyldz.hrinventory.dto.response.InventoryItemResponse;
+import com.mcyldz.hrinventory.dto.response.InventoryStatusHistoryResponse;
 import com.mcyldz.hrinventory.service.InventoryItemService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -33,6 +34,12 @@ public class InventoryItemController {
     public ResponseEntity<ApiResponse<List<InventoryItemResponse>>> getAllInventoryItems(){
         List<InventoryItemResponse> inventoryItemResponses = inventoryItemService.getAllInventoryItems();
         return ResponseEntity.ok(ApiResponse.success("All inventory items retrieved successfully", inventoryItemResponses));
+    }
+
+    @GetMapping("/{id}/history")
+    public ResponseEntity<ApiResponse<List<InventoryStatusHistoryResponse>>> getStatusHistory(@PathVariable UUID id) {
+        List<InventoryStatusHistoryResponse> history = inventoryItemService.getInventoryStatusHistories(id);
+        return ResponseEntity.ok(ApiResponse.success("Status history retrieved successfully", history));
     }
 
     @PostMapping

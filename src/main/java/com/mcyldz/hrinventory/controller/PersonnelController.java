@@ -3,6 +3,7 @@ package com.mcyldz.hrinventory.controller;
 import com.mcyldz.hrinventory.dto.request.PersonnelCreateRequest;
 import com.mcyldz.hrinventory.dto.request.PersonnelUpdateRequest;
 import com.mcyldz.hrinventory.dto.response.ApiResponse;
+import com.mcyldz.hrinventory.dto.response.PersonnelEmploymentHistoryResponse;
 import com.mcyldz.hrinventory.dto.response.PersonnelResponse;
 import com.mcyldz.hrinventory.service.PersonnelService;
 import jakarta.validation.Valid;
@@ -34,6 +35,12 @@ public class PersonnelController {
     public ResponseEntity<ApiResponse<PersonnelResponse>> getPersonnelById(@PathVariable UUID id) {
         PersonnelResponse personnel = personnelService.getPersonnelById(id);
         return ResponseEntity.ok(ApiResponse.success("Personnel retrieved successfully", personnel));
+    }
+
+    @GetMapping("/{id}/history")
+    public ResponseEntity<ApiResponse<List<PersonnelEmploymentHistoryResponse>>> getEmploymentHistory(@PathVariable UUID id) {
+        List<PersonnelEmploymentHistoryResponse> history = personnelService.getEmploymentHistory(id);
+        return ResponseEntity.ok(ApiResponse.success("Employment history retrieved successfully", history));
     }
 
     @PostMapping

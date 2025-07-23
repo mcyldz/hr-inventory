@@ -2,19 +2,15 @@ package com.mcyldz.hrinventory.service.impl;
 
 import com.mcyldz.hrinventory.dto.request.PersonnelCreateRequest;
 import com.mcyldz.hrinventory.dto.request.PersonnelUpdateRequest;
+import com.mcyldz.hrinventory.dto.response.PersonnelEmploymentHistoryResponse;
 import com.mcyldz.hrinventory.dto.response.PersonnelResponse;
-import com.mcyldz.hrinventory.entity.Department;
-import com.mcyldz.hrinventory.entity.EducationLevel;
-import com.mcyldz.hrinventory.entity.Personnel;
-import com.mcyldz.hrinventory.entity.Position;
+import com.mcyldz.hrinventory.entity.*;
 import com.mcyldz.hrinventory.exception.model.DuplicateResourceException;
 import com.mcyldz.hrinventory.exception.model.ErrorCode;
 import com.mcyldz.hrinventory.exception.model.ResourceNotFoundException;
+import com.mcyldz.hrinventory.mapper.PersonnelEmploymentHistoryMapper;
 import com.mcyldz.hrinventory.mapper.PersonnelMapper;
-import com.mcyldz.hrinventory.repository.DepartmentRepository;
-import com.mcyldz.hrinventory.repository.EducationLevelRepository;
-import com.mcyldz.hrinventory.repository.PersonnelRepository;
-import com.mcyldz.hrinventory.repository.PositionRepository;
+import com.mcyldz.hrinventory.repository.*;
 import com.mcyldz.hrinventory.service.PersonnelService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,14 +30,20 @@ public class PersonnelServiceImpl implements PersonnelService {
 
     private final PositionRepository positionRepository;
 
+    private final PersonnelEmploymentHistoryRepository historyRepository;
+
     private final PersonnelMapper personnelMapper;
 
-    public PersonnelServiceImpl(PersonnelRepository personnelRepository, EducationLevelRepository educationLevelRepository, DepartmentRepository departmentRepository, PositionRepository positionRepository, PersonnelMapper personnelMapper) {
+    private final PersonnelEmploymentHistoryMapper historyMapper;
+
+    public PersonnelServiceImpl(PersonnelRepository personnelRepository, EducationLevelRepository educationLevelRepository, DepartmentRepository departmentRepository, PositionRepository positionRepository, PersonnelEmploymentHistoryRepository historyRepository, PersonnelMapper personnelMapper, PersonnelEmploymentHistoryMapper historyMapper) {
         this.personnelRepository = personnelRepository;
         this.educationLevelRepository = educationLevelRepository;
         this.departmentRepository = departmentRepository;
         this.positionRepository = positionRepository;
+        this.historyRepository = historyRepository;
         this.personnelMapper = personnelMapper;
+        this.historyMapper = historyMapper;
     }
 
     @Override
@@ -135,6 +137,17 @@ public class PersonnelServiceImpl implements PersonnelService {
         }catch (Exception e){
             throw new RuntimeException("Could not read file data" + e);
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PersonnelEmploymentHistoryResponse> getEmploymentHistory(UUID personnelId) {
+        if (!personnelRepository.existsById(personnelId)) {
+            throw new ResourceNotFoundException(ErrorCode.PERSONNEL_NOT_FOUND);
+        }
+
+        List<PersonnelEmploymentHistory> historyList = historyRepository.findByPersonnelId(personnelId);
+        return historyMapper.toResponseList(historyList);
     }
 
     private Personnel findPersonnelByIdOrThrow(UUID id){

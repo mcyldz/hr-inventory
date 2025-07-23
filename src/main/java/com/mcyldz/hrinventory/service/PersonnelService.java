@@ -2,6 +2,7 @@ package com.mcyldz.hrinventory.service;
 
 import com.mcyldz.hrinventory.dto.request.PersonnelCreateRequest;
 import com.mcyldz.hrinventory.dto.request.PersonnelUpdateRequest;
+import com.mcyldz.hrinventory.dto.response.PersonnelEmploymentHistoryResponse;
 import com.mcyldz.hrinventory.dto.response.PersonnelResponse;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,4 +22,6 @@ public interface PersonnelService {
     void deletePersonnel(UUID id);
 
     void uploadProfilePhoto(UUID personnelId, MultipartFile file);
+
+    List<PersonnelEmploymentHistoryResponse> getEmploymentHistory(UUID personnelId);
 }

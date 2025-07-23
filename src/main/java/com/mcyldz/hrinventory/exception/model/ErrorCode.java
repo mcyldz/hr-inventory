@@ -11,6 +11,7 @@ public enum ErrorCode {
     INVALID_REQUEST_PAYLOAD("ERR-400", "İstek formatı veya içeriği geçersiz."),
 
     PERSONNEL_HAS_ACTIVE_ASSIGNMENTS("ERR-400-1", "Personelin üzerinde aktif zimmet varken bu işlem yapılamaz."),
+    INVENTORY_ITEM_ALREADY_ASSIGNED("ERR-400-2", "Envanterdeki eşyanın üzerinde aktif zimmet varken bu işlem yapılamaz."),
 
     RESOURCE_NOT_FOUND("ERR-404-1", "İstenen kaynak bulunamadı."),
     USER_NOT_FOUND("ERR-404-2", "Belirtilen ID'ye sahip kullanıcı bulunamadı."),
