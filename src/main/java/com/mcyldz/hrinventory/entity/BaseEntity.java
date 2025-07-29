@@ -15,29 +15,35 @@ import java.util.UUID;
 @Getter
 @Setter
 @MappedSuperclass
-@EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @CreatedDate
     @Column(name = "created_date", nullable = false, updatable = false)
     private LocalDateTime createdDate;
 
-    @CreatedBy
     @Column(name = "created_by", updatable = false)
     private UUID createdBy;
 
-    @LastModifiedDate
     @Column(name = "last_modified_date")
     private LocalDateTime lastModifiedDate;
 
-    @LastModifiedBy
     @Column(name = "last_modified_by")
     private UUID lastModifiedBy;
 
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
+
+    @PrePersist
+    public void onPrePersist() {
+        this.createdDate = LocalDateTime.now();
+        this.lastModifiedDate = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void onPreUpdate() {
+        this.lastModifiedDate = LocalDateTime.now();
+    }
 }
