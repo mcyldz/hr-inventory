@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -86,6 +87,13 @@ public class PersonnelServiceImpl implements PersonnelService {
         }
 
         Personnel savedPersonnel = personnelRepository.save(personnel);
+
+        PersonnelEmploymentHistory initialHistory = new PersonnelEmploymentHistory();
+        initialHistory.setPersonnel(savedPersonnel);
+        initialHistory.setDepartment(savedPersonnel.getDepartment());
+        initialHistory.setPosition(savedPersonnel.getPosition());
+        initialHistory.setStartDate(LocalDate.now());
+        historyRepository.save(initialHistory);
 
         return personnelMapper.toPersonnelResponse(savedPersonnel);
     }
