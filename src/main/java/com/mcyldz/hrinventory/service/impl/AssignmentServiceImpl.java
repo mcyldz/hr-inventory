@@ -10,29 +10,33 @@ import com.mcyldz.hrinventory.exception.model.ResourceNotFoundException;
 import com.mcyldz.hrinventory.mapper.AssignmentMapper;
 import com.mcyldz.hrinventory.repository.*;
 import com.mcyldz.hrinventory.service.AssignmentService;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Service
 public class AssignmentServiceImpl implements AssignmentService {
 
     private final PersonnelInventoryAssignmentRepository assignmentRepository;
     private final PersonnelRepository personnelRepository;
     private final InventoryItemRepository inventoryItemRepository;
     private final InventoryStatusRepository inventoryStatusRepository;
+    private final InventoryStatusHistoryRepository inventoryStatusHistoryRepository;
     private final UserRepository userRepository;
     private final AssignmentMapper assignmentMapper;
 
     private static final String STATUS_IN_USE = "PERSONELDE";
     private static final String STATUS_IN_STOCK = "DEPODA";
 
-    public AssignmentServiceImpl(PersonnelInventoryAssignmentRepository assignmentRepository, PersonnelRepository personnelRepository, InventoryItemRepository inventoryItemRepository, InventoryStatusRepository inventoryStatusRepository, UserRepository userRepository, AssignmentMapper assignmentMapper) {
+    public AssignmentServiceImpl(PersonnelInventoryAssignmentRepository assignmentRepository, PersonnelRepository personnelRepository, InventoryItemRepository inventoryItemRepository, InventoryStatusRepository inventoryStatusRepository, InventoryStatusHistoryRepository inventoryStatusHistoryRepository, UserRepository userRepository, AssignmentMapper assignmentMapper) {
         this.assignmentRepository = assignmentRepository;
         this.personnelRepository = personnelRepository;
         this.inventoryItemRepository = inventoryItemRepository;
         this.inventoryStatusRepository = inventoryStatusRepository;
+        this.inventoryStatusHistoryRepository = inventoryStatusHistoryRepository;
         this.userRepository = userRepository;
         this.assignmentMapper = assignmentMapper;
     }
@@ -79,6 +83,12 @@ public class AssignmentServiceImpl implements AssignmentService {
             item.setCurrentStatus(statusInUse);
             inventoryItemRepository.save(item);
 
+            InventoryStatusHistory history = new InventoryStatusHistory();
+            history.setInventoryItem(item);
+            history.setStatus(statusInUse);
+            history.setChangedBy(currentUser);
+            inventoryStatusHistoryRepository.save(history);
+
             PersonnelInventoryAssignment savedAssignment = assignmentRepository.save(newAssignment);
 
             newAssignments.add(savedAssignment);
@@ -116,6 +126,12 @@ public class AssignmentServiceImpl implements AssignmentService {
             if (item != null) {
                 item.setCurrentStatus(statusInStock);
                 inventoryItemRepository.save(item);
+
+                InventoryStatusHistory history = new InventoryStatusHistory();
+                history.setInventoryItem(item);
+                history.setStatus(statusInStock);
+                history.setChangedBy(currentUser);
+                inventoryStatusHistoryRepository.save(history);
             }
 
             updatedAssignments.add(assignmentRepository.save(assignmentToReturn));
