@@ -3,7 +3,7 @@ package com.mcyldz.hrinventory.controller;
 import com.mcyldz.hrinventory.dto.request.AuthRequest;
 import com.mcyldz.hrinventory.dto.response.ApiResponse;
 import com.mcyldz.hrinventory.dto.response.AuthResponse;
-import com.mcyldz.hrinventory.service.security.AuthenticationService;
+import com.mcyldz.hrinventory.security.AuthenticationService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

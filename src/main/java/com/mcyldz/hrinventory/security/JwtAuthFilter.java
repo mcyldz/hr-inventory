@@ -1,6 +1,5 @@
 package com.mcyldz.hrinventory.security;
 
-import com.mcyldz.hrinventory.service.security.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

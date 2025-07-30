@@ -8,6 +8,7 @@ import com.mcyldz.hrinventory.service.PositionService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,18 +25,21 @@ public class PositionController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<PositionResponse>> getPositionById(@PathVariable UUID id) {
         PositionResponse position = positionService.getPositionById(id);
         return ResponseEntity.ok(ApiResponse.success("Position retrieved successfully", position));
     }
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<List<PositionResponse>>> getAllPositions() {
         List<PositionResponse> positions = positionService.getAllPositions();
         return ResponseEntity.ok(ApiResponse.success("All positions retrieved successfully", positions));
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<PositionResponse>> createPosition(@Valid @RequestBody PositionCreateRequest request) {
         PositionResponse createdPosition = positionService.createPosition(request);
         return ResponseEntity
@@ -44,6 +48,7 @@ public class PositionController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<PositionResponse>> updatePosition(
             @PathVariable UUID id,
             @Valid @RequestBody PositionUpdateRequest request) {
@@ -52,6 +57,7 @@ public class PositionController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deletePosition(@PathVariable UUID id) {
         positionService.deletePosition(id);
         return ResponseEntity.noContent().build();

@@ -8,6 +8,7 @@ import com.mcyldz.hrinventory.service.EducationLevelService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,18 +25,21 @@ public class EducationLevelController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<EducationLevelResponse>> getEducationLevelById(@PathVariable UUID id) {
         EducationLevelResponse level = educationLevelService.getEducationLevelById(id);
         return ResponseEntity.ok(ApiResponse.success("Education level retrieved successfully", level));
     }
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<List<EducationLevelResponse>>> getAllEducationLevels() {
         List<EducationLevelResponse> levels = educationLevelService.getAllEducationLevels();
         return ResponseEntity.ok(ApiResponse.success("All education levels retrieved successfully", levels));
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<EducationLevelResponse>> createEducationLevel(@Valid @RequestBody EducationLevelCreateRequest request) {
         EducationLevelResponse createdLevel = educationLevelService.createEducationLevel(request);
         return ResponseEntity
@@ -44,6 +48,7 @@ public class EducationLevelController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<EducationLevelResponse>> updateEducationLevel(
             @PathVariable UUID id,
             @Valid @RequestBody EducationLevelUpdateRequest request) {
@@ -52,6 +57,7 @@ public class EducationLevelController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteEducationLevel(@PathVariable UUID id) {
         educationLevelService.deleteEducationLevel(id);
         return ResponseEntity.noContent().build();

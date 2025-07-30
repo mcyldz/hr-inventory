@@ -1,4 +1,4 @@
-package com.mcyldz.hrinventory.service.security;
+package com.mcyldz.hrinventory.security;
 
 import com.mcyldz.hrinventory.entity.User;
 import com.mcyldz.hrinventory.repository.UserRepository;

@@ -1,7 +1,7 @@
 package com.mcyldz.hrinventory.config;
 
 import com.mcyldz.hrinventory.security.JwtAuthFilter;
-import com.mcyldz.hrinventory.service.security.UserDetailsServiceImpl;
+import com.mcyldz.hrinventory.security.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

@@ -9,6 +9,7 @@ import com.mcyldz.hrinventory.service.PersonnelService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,24 +26,28 @@ public class PersonnelController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
     public ResponseEntity<ApiResponse<List<PersonnelResponse>>> getAllPersonnel() {
         List<PersonnelResponse> personnelList = personnelService.getAllPersonnel();
         return ResponseEntity.ok(ApiResponse.success("All personnel retrieved successfully", personnelList));
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
     public ResponseEntity<ApiResponse<PersonnelResponse>> getPersonnelById(@PathVariable UUID id) {
         PersonnelResponse personnel = personnelService.getPersonnelById(id);
         return ResponseEntity.ok(ApiResponse.success("Personnel retrieved successfully", personnel));
     }
 
     @GetMapping("/{id}/history")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
     public ResponseEntity<ApiResponse<List<PersonnelEmploymentHistoryResponse>>> getEmploymentHistory(@PathVariable UUID id) {
         List<PersonnelEmploymentHistoryResponse> history = personnelService.getEmploymentHistory(id);
         return ResponseEntity.ok(ApiResponse.success("Employment history retrieved successfully", history));
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
     public ResponseEntity<ApiResponse<PersonnelResponse>> createPersonnel(@Valid @RequestBody PersonnelCreateRequest request) {
         PersonnelResponse createdPersonnel = personnelService.createPersonnel(request);
         return ResponseEntity
@@ -51,6 +56,7 @@ public class PersonnelController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
     public ResponseEntity<ApiResponse<PersonnelResponse>> updatePersonnel(
             @PathVariable UUID id,
             @Valid @RequestBody PersonnelUpdateRequest request) {
@@ -59,6 +65,7 @@ public class PersonnelController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
     public ResponseEntity<Void> deletePersonnel(@PathVariable UUID id) {
         personnelService.deletePersonnel(id);
         return ResponseEntity.noContent().build();

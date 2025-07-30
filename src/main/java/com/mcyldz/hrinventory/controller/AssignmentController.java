@@ -8,6 +8,7 @@ import com.mcyldz.hrinventory.service.AssignmentService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class AssignmentController {
     }
 
     @GetMapping("/personnel/{personnelId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
     public ResponseEntity<ApiResponse<List<AssignmentResponse>>> getAssignmentsByPersonnel(
             @PathVariable UUID personnelId) {
 
@@ -32,6 +34,7 @@ public class AssignmentController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
     public ResponseEntity<ApiResponse<List<AssignmentResponse>>> createAssignments(
             @Valid @RequestBody AssignmentCreateRequest request) {
 
@@ -42,6 +45,7 @@ public class AssignmentController {
     }
 
     @PutMapping("/return")
+    @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
     public ResponseEntity<ApiResponse<List<AssignmentResponse>>> returnAssignments(
             @Valid @RequestBody AssignmentReturnRequest request) {
 

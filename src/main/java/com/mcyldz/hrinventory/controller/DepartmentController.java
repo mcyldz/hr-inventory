@@ -8,6 +8,7 @@ import com.mcyldz.hrinventory.service.DepartmentService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,18 +25,21 @@ public class DepartmentController {
     }
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<List<DepartmentResponse>>> getAllDepartments() {
         List<DepartmentResponse> departments = departmentService.getAllDepartments();
         return ResponseEntity.ok(ApiResponse.success("All departments retrieved successfully", departments));
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<DepartmentResponse>> getDepartmentById(@PathVariable UUID id) {
         DepartmentResponse department = departmentService.getDepartmentById(id);
         return ResponseEntity.ok(ApiResponse.success("Department retrieved successfully", department));
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<DepartmentResponse>> createDepartment(@Valid @RequestBody DepartmentCreateRequest request) {
         DepartmentResponse createdDepartment = departmentService.createDepartment(request);
         return ResponseEntity
@@ -44,6 +48,7 @@ public class DepartmentController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<DepartmentResponse>> updateDepartment(
             @PathVariable UUID id,
             @Valid @RequestBody DepartmentUpdateRequest request) {
@@ -52,6 +57,7 @@ public class DepartmentController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteDepartment(@PathVariable UUID id) {
         departmentService.deleteDepartment(id);
         return ResponseEntity.noContent().build();

@@ -1,15 +1,11 @@
-package com.mcyldz.hrinventory.service.security;
+package com.mcyldz.hrinventory.security;
 
 import com.mcyldz.hrinventory.dto.request.AuthRequest;
 import com.mcyldz.hrinventory.dto.response.AuthResponse;
-import com.mcyldz.hrinventory.entity.User;
-import com.mcyldz.hrinventory.repository.UserRepository;
-import com.mcyldz.hrinventory.security.JwtService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuthenticationService {

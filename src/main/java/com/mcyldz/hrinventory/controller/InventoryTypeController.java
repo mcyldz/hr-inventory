@@ -8,6 +8,7 @@ import com.mcyldz.hrinventory.service.InventoryTypeService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,18 +25,21 @@ public class InventoryTypeController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<InventoryTypeResponse>> getTypeById(@PathVariable UUID id) {
         InventoryTypeResponse type = inventoryTypeService.getTypeById(id);
         return ResponseEntity.ok(ApiResponse.success("Inventory type retrieved successfully", type));
     }
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<List<InventoryTypeResponse>>> getAllTypes() {
         List<InventoryTypeResponse> types = inventoryTypeService.getAllTypes();
         return ResponseEntity.ok(ApiResponse.success("All inventory types retrieved successfully", types));
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_MANAGER')")
     public ResponseEntity<ApiResponse<InventoryTypeResponse>> createType(@Valid @RequestBody InventoryTypeCreateRequest request) {
         InventoryTypeResponse createdType = inventoryTypeService.createType(request);
         return ResponseEntity
@@ -44,6 +48,7 @@ public class InventoryTypeController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_MANAGER')")
     public ResponseEntity<ApiResponse<InventoryTypeResponse>> updateType(
             @PathVariable UUID id,
             @Valid @RequestBody InventoryTypeUpdateRequest request) {
@@ -52,6 +57,7 @@ public class InventoryTypeController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_MANAGER')")
     public ResponseEntity<Void> deleteType(@PathVariable UUID id) {
         inventoryTypeService.deleteType(id);
         return ResponseEntity.noContent().build();
