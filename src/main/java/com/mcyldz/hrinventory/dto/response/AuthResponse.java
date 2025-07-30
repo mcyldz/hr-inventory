@@ -1,0 +1,13 @@
+package com.mcyldz.hrinventory.dto.response;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class AuthResponse {
+
+    private String accessToken;
+}

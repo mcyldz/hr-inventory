@@ -5,17 +5,11 @@ spring:
     name: hr-inventory
 
 server:
-  port: 8088
+  port: 8080
 
 jwt:
   secret_key: ${JWT_SECRET_KEY}
   expires_in_ms: 900000
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info
 
 logging:
   level:
