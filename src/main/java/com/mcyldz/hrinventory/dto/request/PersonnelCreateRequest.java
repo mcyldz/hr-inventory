@@ -42,4 +42,6 @@ public class PersonnelCreateRequest {
     private UUID positionId;
 
     private UUID educationLevelId;
+
+    private String profilePhoto;
 }

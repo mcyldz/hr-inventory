@@ -41,5 +41,7 @@ public class PersonnelUpdateRequest {
     private UUID educationLevelId;
 
     @NotNull(message = "Active status cannot be null")
-    private Boolean isActive;
+    private boolean isActive;
+
+    private String profilePhoto;
 }

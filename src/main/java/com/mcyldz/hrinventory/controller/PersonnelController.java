@@ -10,7 +10,6 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -49,17 +48,6 @@ public class PersonnelController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Personnel created successfully", createdPersonnel));
-    }
-
-    @PostMapping("/{id}/photo")
-    public ResponseEntity<ApiResponse<Void>> uploadProfilePhoto(@PathVariable UUID id,
-            @RequestParam("file") MultipartFile file){
-
-        if (file.isEmpty()) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("File cannot be empty."));
-        }
-        personnelService.uploadProfilePhoto(id, file);
-        return ResponseEntity.ok(ApiResponse.success("Profile photo uploaded successfully."));
     }
 
     @PutMapping("/{id}")

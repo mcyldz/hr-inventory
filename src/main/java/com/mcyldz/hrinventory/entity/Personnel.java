@@ -40,7 +40,7 @@ public class Personnel extends BaseEntity{
     private MaritalStatus maritalStatus;
 
     @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
+    private boolean isActive = true;
 
     @Lob
     @Column(name = "profile_photo", columnDefinition = "BYTEA")
@@ -57,6 +57,4 @@ public class Personnel extends BaseEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "position_id", nullable = false, referencedColumnName = "id")
     private Position position;
-
-
 }
