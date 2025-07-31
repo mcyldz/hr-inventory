@@ -62,4 +62,5 @@ public class InventoryTypeController {
         inventoryTypeService.deleteType(id);
         return ResponseEntity.noContent().build();
     }
+
 }

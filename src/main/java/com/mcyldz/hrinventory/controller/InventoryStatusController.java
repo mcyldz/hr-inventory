@@ -62,4 +62,5 @@ public class InventoryStatusController {
         inventoryStatusService.deleteStatus(id);
         return ResponseEntity.noContent().build();
     }
+
 }

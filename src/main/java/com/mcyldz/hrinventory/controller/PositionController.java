@@ -62,4 +62,5 @@ public class PositionController {
         positionService.deletePosition(id);
         return ResponseEntity.noContent().build();
     }
+
 }

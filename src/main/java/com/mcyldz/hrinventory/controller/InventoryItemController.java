@@ -68,4 +68,5 @@ public class InventoryItemController {
         inventoryItemService.deleteInventoryItem(id);
         return ResponseEntity.noContent().build();
     }
+
 }

@@ -32,4 +32,5 @@ public class AuthenticationService {
 
         return new AuthResponse(jwtToken);
     }
+
 }

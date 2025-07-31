@@ -26,4 +26,5 @@ public class AuthController {
         AuthResponse authResponse = authenticationService.login(request);
         return ResponseEntity.ok(ApiResponse.success("Login Successful", authResponse));
     }
+
 }

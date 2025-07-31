@@ -52,4 +52,5 @@ public class AssignmentController {
         List<AssignmentResponse> returnedAssignments = assignmentService.returnAssignments(request);
         return ResponseEntity.ok(ApiResponse.success("Assignments returned successfully", returnedAssignments));
     }
+
 }

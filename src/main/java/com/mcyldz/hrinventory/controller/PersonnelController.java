@@ -70,4 +70,5 @@ public class PersonnelController {
         personnelService.deletePersonnel(id);
         return ResponseEntity.noContent().build();
     }
+
 }

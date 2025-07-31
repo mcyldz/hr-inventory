@@ -62,4 +62,5 @@ public class EducationLevelController {
         educationLevelService.deleteEducationLevel(id);
         return ResponseEntity.noContent().build();
     }
+
 }
