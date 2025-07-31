@@ -14,11 +14,11 @@ import com.mcyldz.hrinventory.repository.*;
 import com.mcyldz.hrinventory.service.PersonnelService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class PersonnelServiceImpl implements PersonnelService {
@@ -86,6 +86,7 @@ public class PersonnelServiceImpl implements PersonnelService {
             personnel.setEducationLevel(educationLevel);
         }
 
+        personnel.setRegistryNumber(generateUniqueRegistryNumber());
         Personnel savedPersonnel = personnelRepository.save(personnel);
 
         PersonnelEmploymentHistory initialHistory = new PersonnelEmploymentHistory();
@@ -136,18 +137,6 @@ public class PersonnelServiceImpl implements PersonnelService {
     }
 
     @Override
-    @Transactional
-    public void uploadProfilePhoto(UUID personnelId, MultipartFile file) {
-        Personnel personnel = findPersonnelByIdOrThrow(personnelId);
-        try {
-            personnel.setProfilePhoto(file.getBytes());
-            personnelRepository.save(personnel);
-        }catch (Exception e){
-            throw new RuntimeException("Could not read file data" + e);
-        }
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public List<PersonnelEmploymentHistoryResponse> getEmploymentHistory(UUID personnelId) {
         if (!personnelRepository.existsById(personnelId)) {
@@ -161,5 +150,18 @@ public class PersonnelServiceImpl implements PersonnelService {
     private Personnel findPersonnelByIdOrThrow(UUID id){
         return personnelRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException(ErrorCode.PERSONNEL_NOT_FOUND));
+    }
+
+    private Integer generateUniqueRegistryNumber(){
+        int min = 1_000_000;
+        int max = 10_000_000;
+
+        Integer registeryNumber;
+
+        do {
+            registeryNumber =ThreadLocalRandom.current().nextInt(min, max);
+        } while (personnelRepository.existsByRegistryNumber(registeryNumber));
+
+        return registeryNumber;
     }
 }

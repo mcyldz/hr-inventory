@@ -1,11 +1,14 @@
 package com.mcyldz.hrinventory.entity;
 
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.*;
 
+import java.sql.Types;
 import java.time.LocalDate;
 
 @Entity
@@ -43,7 +46,8 @@ public class Personnel extends BaseEntity{
     private boolean isActive = true;
 
     @Lob
-    @Column(name = "profile_photo", columnDefinition = "BYTEA")
+    @Column(name = "profile_photo")
+    @JdbcTypeCode(Types.BINARY)
     private byte[] profilePhoto;
 
     @ManyToOne(fetch = FetchType.LAZY)
