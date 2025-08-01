@@ -13,6 +13,9 @@ public enum ErrorCode {
     PERSONNEL_HAS_ACTIVE_ASSIGNMENTS("ERR-400-1", "Personelin üzerinde aktif zimmet varken bu işlem yapılamaz."),
     INVENTORY_ITEM_ALREADY_ASSIGNED("ERR-400-2", "Envanterdeki eşyanın üzerinde aktif zimmet varken bu işlem yapılamaz."),
 
+    REFRESH_TOKEN_EXPIRED("ERR-401-1", "Refresh token'ın süresi doldu."),
+    REFRESH_TOKEN_NOT_FOUND("ERR-401-2", "Refresh token bulunamadı."),
+
     RESOURCE_NOT_FOUND("ERR-404-1", "İstenen kaynak bulunamadı."),
     USER_NOT_FOUND("ERR-404-2", "Belirtilen ID'ye sahip kullanıcı bulunamadı."),
     ROLE_NOT_FOUND("ERR-404-3", "Belirtilen ID'ye sahip rol bulunamadı."),
@@ -23,7 +26,7 @@ public enum ErrorCode {
     POSITION_NOT_FOUND("ERR-404-8", "Belirtilen ID'ye sahip pozisyon bulunamadı."),
     EDUCATION_LEVEL_NOT_FOUND("ERR-404-9", "Belirtilen ID'ye sahip eğitim düzeyi bulunamadı."),
     INVENTORY_TYPE_NOT_FOUND("ERR-404-10", "Belirtilen ID'ye sahip envanter tipi bulunamadı."),
-    INVENTORY_STATUS_NOT_FOUND("ERR-404-11", "Belirtilen ID'ye sahip envanter statüsü bulunamadı.."),
+    INVENTORY_STATUS_NOT_FOUND("ERR-404-11", "Belirtilen ID'ye sahip envanter statüsü bulunamadı."),
 
     USERNAME_ALREADY_EXISTS("ERR-409-1", "Bu kullanıcı adı zaten kullanılıyor."),
     TCKN_ALREADY_EXISTS("ERR-409-2", "Bu T.C. Kimlik Numarası zaten kayıtlı."),

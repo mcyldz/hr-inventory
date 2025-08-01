@@ -10,6 +10,8 @@ server:
 jwt:
   secret_key: ${JWT_SECRET_KEY}
   expires_in_ms: 900000
+  refresh_token:
+    expires_in_s: 86400
 
 logging:
   level:

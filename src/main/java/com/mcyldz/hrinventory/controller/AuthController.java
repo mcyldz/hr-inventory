@@ -1,6 +1,7 @@
 package com.mcyldz.hrinventory.controller;
 
 import com.mcyldz.hrinventory.dto.request.AuthRequest;
+import com.mcyldz.hrinventory.dto.request.RefreshTokenRequest;
 import com.mcyldz.hrinventory.dto.response.ApiResponse;
 import com.mcyldz.hrinventory.dto.response.AuthResponse;
 import com.mcyldz.hrinventory.security.AuthenticationService;
@@ -27,4 +28,9 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success("Login Successful", authResponse));
     }
 
+    @PostMapping("/refresh-token")
+    public ResponseEntity<ApiResponse<AuthResponse>> refreshToken(@Valid @RequestBody RefreshTokenRequest request){
+        AuthResponse authResponse = authenticationService.refreshToken(request.getRefreshToken());
+        return ResponseEntity.ok(ApiResponse.success("Token refreshed successfully", authResponse));
+    }
 }
