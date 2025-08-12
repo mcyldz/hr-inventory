@@ -44,4 +44,6 @@ public class PersonnelUpdateRequest {
     private boolean isActive;
 
     private String profilePhoto;
+
+    private String terminationReason;
 }

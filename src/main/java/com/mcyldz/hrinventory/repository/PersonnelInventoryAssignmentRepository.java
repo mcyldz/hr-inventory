@@ -13,4 +13,6 @@ public interface PersonnelInventoryAssignmentRepository extends JpaRepository<Pe
     List<PersonnelInventoryAssignment> findByPersonnelIdAndReturnDateIsNull(UUID personnelId);
 
     boolean existsByInventoryItemIdAndReturnDateIsNull(UUID inventoryItemId);
+
+    boolean existsByPersonnelIdAndReturnDateIsNull(UUID personnelId);
 }

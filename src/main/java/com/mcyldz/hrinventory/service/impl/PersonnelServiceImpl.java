@@ -5,6 +5,7 @@ import com.mcyldz.hrinventory.dto.request.PersonnelUpdateRequest;
 import com.mcyldz.hrinventory.dto.response.PersonnelEmploymentHistoryResponse;
 import com.mcyldz.hrinventory.dto.response.PersonnelResponse;
 import com.mcyldz.hrinventory.entity.*;
+import com.mcyldz.hrinventory.exception.model.BusinessLogicException;
 import com.mcyldz.hrinventory.exception.model.DuplicateResourceException;
 import com.mcyldz.hrinventory.exception.model.ErrorCode;
 import com.mcyldz.hrinventory.exception.model.ResourceNotFoundException;
@@ -37,7 +38,9 @@ public class PersonnelServiceImpl implements PersonnelService {
 
     private final PersonnelEmploymentHistoryMapper historyMapper;
 
-    public PersonnelServiceImpl(PersonnelRepository personnelRepository, EducationLevelRepository educationLevelRepository, DepartmentRepository departmentRepository, PositionRepository positionRepository, PersonnelEmploymentHistoryRepository historyRepository, PersonnelMapper personnelMapper, PersonnelEmploymentHistoryMapper historyMapper) {
+    private final PersonnelInventoryAssignmentRepository assignmentRepository;
+
+    public PersonnelServiceImpl(PersonnelRepository personnelRepository, EducationLevelRepository educationLevelRepository, DepartmentRepository departmentRepository, PositionRepository positionRepository, PersonnelEmploymentHistoryRepository historyRepository, PersonnelMapper personnelMapper, PersonnelEmploymentHistoryMapper historyMapper, PersonnelInventoryAssignmentRepository assignmentRepository) {
         this.personnelRepository = personnelRepository;
         this.educationLevelRepository = educationLevelRepository;
         this.departmentRepository = departmentRepository;
@@ -45,6 +48,7 @@ public class PersonnelServiceImpl implements PersonnelService {
         this.historyRepository = historyRepository;
         this.personnelMapper = personnelMapper;
         this.historyMapper = historyMapper;
+        this.assignmentRepository = assignmentRepository;
     }
 
     @Override
@@ -74,7 +78,9 @@ public class PersonnelServiceImpl implements PersonnelService {
 
         Department department = departmentRepository.findById(request.getDepartmentId())
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.DEPARTMENT_NOT_FOUND, "Department not found with id: " + request.getDepartmentId()));
-        Position position = positionRepository.findById(request.getPositionId()).orElseThrow(()->new ResourceNotFoundException(ErrorCode.POSITION_NOT_FOUND, "Position not found with id: " + request.getPositionId()));
+
+        Position position = positionRepository.findById(request.getPositionId())
+                .orElseThrow(()->new ResourceNotFoundException(ErrorCode.POSITION_NOT_FOUND, "Position not found with id: " + request.getPositionId()));
 
         personnel.setDepartment(department);
         personnel.setPosition(position);
@@ -89,12 +95,7 @@ public class PersonnelServiceImpl implements PersonnelService {
         personnel.setRegistryNumber(generateUniqueRegistryNumber());
         Personnel savedPersonnel = personnelRepository.save(personnel);
 
-        PersonnelEmploymentHistory initialHistory = new PersonnelEmploymentHistory();
-        initialHistory.setPersonnel(savedPersonnel);
-        initialHistory.setDepartment(savedPersonnel.getDepartment());
-        initialHistory.setPosition(savedPersonnel.getPosition());
-        initialHistory.setStartDate(LocalDate.now());
-        historyRepository.save(initialHistory);
+        createEmploymentHistory(savedPersonnel);
 
         return personnelMapper.toPersonnelResponse(savedPersonnel);
     }
@@ -103,26 +104,57 @@ public class PersonnelServiceImpl implements PersonnelService {
     @Transactional
     public PersonnelResponse updatePersonnel(UUID id, PersonnelUpdateRequest request) {
 
-        Personnel personnel = findPersonnelByIdOrThrow(id);
-        personnelMapper.updatePersonnelFromRequest(request, personnel);
+        Personnel existPersonnel = findPersonnelByIdOrThrow(id);
+
+        UUID oldDepartmantId = existPersonnel.getDepartment().getId();
+        UUID oldPositionId = existPersonnel.getPosition().getId();
+        boolean oldActive = existPersonnel.isActive();
+
+        personnelMapper.updatePersonnelFromRequest(request, existPersonnel);
 
         Department department = departmentRepository.findById(request.getDepartmentId())
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.RESOURCE_NOT_FOUND, "Department not found with id: " + request.getDepartmentId()));
-        Position position = positionRepository.findById(request.getPositionId()).orElseThrow(()->new ResourceNotFoundException(ErrorCode.RESOURCE_NOT_FOUND, "Position not found with id: " + request.getPositionId()));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.DEPARTMENT_NOT_FOUND, "Department not found with id: " + request.getDepartmentId()));
 
-        personnel.setDepartment(department);
-        personnel.setPosition(position);
+        Position position = positionRepository.findById(request.getPositionId())
+                .orElseThrow(()->new ResourceNotFoundException(ErrorCode.POSITION_NOT_FOUND, "Position not found with id: " + request.getPositionId()));
+
+        existPersonnel.setDepartment(department);
+        existPersonnel.setPosition(position);
 
         if (request.getEducationLevelId() != null){
 
-            EducationLevel educationLevel = educationLevelRepository.findById(request.getEducationLevelId()).orElseThrow(()->new ResourceNotFoundException(ErrorCode.RESOURCE_NOT_FOUND, "Education level not found with id: " + request.getEducationLevelId()));
+            EducationLevel educationLevel = educationLevelRepository.findById(request.getEducationLevelId())
+                    .orElseThrow(()->new ResourceNotFoundException(ErrorCode.EDUCATION_LEVEL_NOT_FOUND, "Education level not found with id: " + request.getEducationLevelId()));
 
-            personnel.setEducationLevel(educationLevel);
-        } else {
-            personnel.setEducationLevel(null);
+            existPersonnel.setEducationLevel(educationLevel);
         }
 
-        Personnel updatedPersonnel = personnelRepository.save(personnel);
+        if (!request.getDepartmentId().equals(oldDepartmantId) || !request.getPositionId().equals(oldPositionId)){
+
+            PersonnelEmploymentHistory employmentHistory = historyRepository.findByPersonnelIdAndEndDateIsNull(existPersonnel.getId())
+                    .orElseThrow(()->new ResourceNotFoundException(ErrorCode.RESOURCE_NOT_FOUND));
+
+            employmentHistory.setEndDate(LocalDate.now());
+            historyRepository.save(employmentHistory);
+
+            createEmploymentHistory(existPersonnel);
+        }
+
+        if (oldActive && !request.isActive()){
+
+            if (assignmentRepository.existsByPersonnelIdAndReturnDateIsNull(existPersonnel.getId())){
+                throw new BusinessLogicException(ErrorCode.PERSONNEL_HAS_ACTIVE_ASSIGNMENTS);
+            }
+
+            PersonnelEmploymentHistory employmentHistory = historyRepository.findByPersonnelIdAndEndDateIsNull(existPersonnel.getId())
+                    .orElseThrow(()->new ResourceNotFoundException(ErrorCode.RESOURCE_NOT_FOUND));
+
+            employmentHistory.setEndDate(LocalDate.now());
+            employmentHistory.setTerminationReason(request.getTerminationReason());
+            historyRepository.save(employmentHistory);
+        }
+
+        Personnel updatedPersonnel = personnelRepository.save(existPersonnel);
 
         return personnelMapper.toPersonnelResponse(updatedPersonnel);
     }
@@ -163,5 +195,14 @@ public class PersonnelServiceImpl implements PersonnelService {
         } while (personnelRepository.existsByRegistryNumber(registeryNumber));
 
         return registeryNumber;
+    }
+
+    private void createEmploymentHistory(Personnel personnel){
+        PersonnelEmploymentHistory employmentHistory = new PersonnelEmploymentHistory();
+        employmentHistory.setPersonnel(personnel);
+        employmentHistory.setDepartment(personnel.getDepartment());
+        employmentHistory.setPosition(personnel.getPosition());
+        employmentHistory.setStartDate(LocalDate.now());
+        historyRepository.save(employmentHistory);
     }
 }
