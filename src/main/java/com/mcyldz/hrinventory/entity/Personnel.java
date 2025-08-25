@@ -17,6 +17,8 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLDelete(sql = "UPDATE personnel SET is_deleted = true, last_modified_date = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("is_deleted = false")
 public class Personnel extends BaseEntity{
 
     @Column(name = "registry_number", nullable = false, unique = true)
