@@ -11,7 +11,7 @@ public interface DepartmentService {
 
     DepartmentResponse getDepartmentById(UUID id);
 
-    List<DepartmentResponse> getAllDepartments();
+    List<DepartmentResponse> getAllDepartments(Integer page, Integer size);
 
     DepartmentResponse createDepartment(DepartmentCreateRequest request);
 

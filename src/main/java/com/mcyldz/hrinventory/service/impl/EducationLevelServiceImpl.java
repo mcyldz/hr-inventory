@@ -9,6 +9,9 @@ import com.mcyldz.hrinventory.exception.model.ResourceNotFoundException;
 import com.mcyldz.hrinventory.mapper.EducationLevelMapper;
 import com.mcyldz.hrinventory.repository.EducationLevelRepository;
 import com.mcyldz.hrinventory.service.EducationLevelService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,9 +38,15 @@ public class EducationLevelServiceImpl implements EducationLevelService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<EducationLevelResponse> getAllEducationLevels() {
+    public List<EducationLevelResponse> getAllEducationLevels(Integer page, Integer size) {
 
-        return educationLevelMapper.toEducationLevelResponseList(educationLevelRepository.findAll());
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<EducationLevel> educationLevelPage = educationLevelRepository.findAll(pageable);
+
+        List<EducationLevel> educationLevelList = educationLevelPage.getContent();
+
+        return educationLevelMapper.toEducationLevelResponseList(educationLevelList);
     }
 
     @Override

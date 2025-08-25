@@ -11,7 +11,7 @@ public interface InventoryTypeService {
 
     InventoryTypeResponse getTypeById(UUID id);
 
-    List<InventoryTypeResponse> getAllTypes();
+    List<InventoryTypeResponse> getAllTypes(Integer page, Integer size);
 
     InventoryTypeResponse createType(InventoryTypeCreateRequest request);
 

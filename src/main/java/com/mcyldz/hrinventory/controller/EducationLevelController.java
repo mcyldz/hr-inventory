@@ -33,8 +33,11 @@ public class EducationLevelController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<List<EducationLevelResponse>>> getAllEducationLevels() {
-        List<EducationLevelResponse> levels = educationLevelService.getAllEducationLevels();
+    public ResponseEntity<ApiResponse<List<EducationLevelResponse>>> getAllEducationLevels(
+            @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
+            @RequestParam(name = "size", required = false, defaultValue = "20") Integer size
+    ) {
+        List<EducationLevelResponse> levels = educationLevelService.getAllEducationLevels(page, size);
         return ResponseEntity.ok(ApiResponse.success("All education levels retrieved successfully", levels));
     }
 

@@ -13,7 +13,7 @@ public interface InventoryItemService {
 
     InventoryItemResponse getInventoryItemById(UUID id);
 
-    List<InventoryItemResponse> getAllInventoryItems();
+    List<InventoryItemResponse> getAllInventoryItems(Integer page, Integer size);
 
     InventoryItemResponse createInventoryItem(InventoryCreateRequest request);
 

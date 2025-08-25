@@ -12,7 +12,7 @@ public interface PersonnelService {
 
     PersonnelResponse getPersonnelById(UUID id);
 
-    List<PersonnelResponse> getAllPersonnel();
+    List<PersonnelResponse> getAllPersonnel(Integer page, Integer size);
 
     PersonnelResponse createPersonnel(PersonnelCreateRequest request);
 

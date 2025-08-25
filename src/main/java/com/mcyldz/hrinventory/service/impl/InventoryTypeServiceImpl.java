@@ -10,6 +10,9 @@ import com.mcyldz.hrinventory.exception.model.ResourceNotFoundException;
 import com.mcyldz.hrinventory.mapper.InventoryTypeMapper;
 import com.mcyldz.hrinventory.repository.InventoryTypeRepository;
 import com.mcyldz.hrinventory.service.InventoryTypeService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,8 +38,15 @@ public class InventoryTypeServiceImpl implements InventoryTypeService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<InventoryTypeResponse> getAllTypes() {
-        return inventoryTypeMapper.toInventoryTypeResponseList(inventoryTypeRepository.findAll());
+    public List<InventoryTypeResponse> getAllTypes(Integer page, Integer size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<InventoryType> inventoryTypePage = inventoryTypeRepository.findAll(pageable);
+
+        List<InventoryType> inventoryTypeList = inventoryTypePage.getContent();
+
+        return inventoryTypeMapper.toInventoryTypeResponseList(inventoryTypeList);
     }
 
     @Override

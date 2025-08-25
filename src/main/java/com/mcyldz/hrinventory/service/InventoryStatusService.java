@@ -11,7 +11,7 @@ public interface InventoryStatusService {
 
     InventoryStatusResponse getStatusById(UUID id);
 
-    List<InventoryStatusResponse> getAllStatuses();
+    List<InventoryStatusResponse> getAllStatuses(Integer page, Integer size);
 
     InventoryStatusResponse createStatus(InventoryStatusCreateRequest request);
 

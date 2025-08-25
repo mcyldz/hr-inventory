@@ -11,7 +11,7 @@ public interface EducationLevelService {
 
     EducationLevelResponse getEducationLevelById(UUID id);
 
-    List<EducationLevelResponse> getAllEducationLevels();
+    List<EducationLevelResponse> getAllEducationLevels(Integer page, Integer size);
 
     EducationLevelResponse createEducationLevel(EducationLevelCreateRequest request);
 

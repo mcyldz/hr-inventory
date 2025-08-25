@@ -11,7 +11,7 @@ public interface UserService {
 
     UserResponse getUserById(UUID id);
 
-    List<UserResponse> getAllUsers();
+    List<UserResponse> getAllUsers(Integer page, Integer size);
 
     UserResponse createUser(UserCreateRequest request);
 

@@ -13,6 +13,9 @@ import com.mcyldz.hrinventory.mapper.PersonnelEmploymentHistoryMapper;
 import com.mcyldz.hrinventory.mapper.PersonnelMapper;
 import com.mcyldz.hrinventory.repository.*;
 import com.mcyldz.hrinventory.service.PersonnelService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,10 +64,15 @@ public class PersonnelServiceImpl implements PersonnelService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<PersonnelResponse> getAllPersonnel() {
+    public List<PersonnelResponse> getAllPersonnel(Integer page, Integer size) {
 
-        List<Personnel> personnels = personnelRepository.findAll();
-        return personnelMapper.toPersonnelResponseList(personnels);
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Personnel> personnelPage = personnelRepository.findAll(pageable);
+
+        List<Personnel> personnelList = personnelPage.getContent();
+
+        return personnelMapper.toPersonnelResponseList(personnelList);
     }
 
     @Override

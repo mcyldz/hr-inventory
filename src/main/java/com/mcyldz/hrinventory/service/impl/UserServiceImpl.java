@@ -14,6 +14,9 @@ import com.mcyldz.hrinventory.repository.PersonnelRepository;
 import com.mcyldz.hrinventory.repository.RoleRepository;
 import com.mcyldz.hrinventory.repository.UserRepository;
 import com.mcyldz.hrinventory.service.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,8 +43,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<UserResponse> getAllUsers() {
-        return userMapper.toUserResponseList(userRepository.findAll());
+    public List<UserResponse> getAllUsers(Integer page, Integer size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<User> userPage = userRepository.findAll(pageable);
+
+        List<User> userList = userPage.getContent();
+
+        return userMapper.toUserResponseList(userList);
     }
 
     @Override

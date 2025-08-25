@@ -33,8 +33,11 @@ public class RoleController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<List<RoleResponse>>> getAllRoles(){
-        List<RoleResponse> roles = roleService.getAllRoles();
+    public ResponseEntity<ApiResponse<List<RoleResponse>>> getAllRoles(
+            @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
+            @RequestParam(name = "size", required = false, defaultValue = "20") Integer size
+    ){
+        List<RoleResponse> roles = roleService.getAllRoles(page, size);
         return ResponseEntity.ok(ApiResponse.success("Role retrieved successfully", roles));
     }
 

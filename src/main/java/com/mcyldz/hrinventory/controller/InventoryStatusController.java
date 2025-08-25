@@ -26,8 +26,11 @@ public class InventoryStatusController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<List<InventoryStatusResponse>>> getAllStatuses() {
-        List<InventoryStatusResponse> statuses = inventoryStatusService.getAllStatuses();
+    public ResponseEntity<ApiResponse<List<InventoryStatusResponse>>> getAllStatuses(
+            @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
+            @RequestParam(name = "size", required = false, defaultValue = "20") Integer size
+    ) {
+        List<InventoryStatusResponse> statuses = inventoryStatusService.getAllStatuses(page, size);
         return ResponseEntity.ok(ApiResponse.success("All inventory statuses retrieved successfully", statuses));
     }
 

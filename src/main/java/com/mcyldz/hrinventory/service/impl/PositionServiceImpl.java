@@ -9,6 +9,9 @@ import com.mcyldz.hrinventory.exception.model.ResourceNotFoundException;
 import com.mcyldz.hrinventory.mapper.PositionMapper;
 import com.mcyldz.hrinventory.repository.PositionRepository;
 import com.mcyldz.hrinventory.service.PositionService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,8 +37,15 @@ public class PositionServiceImpl implements PositionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<PositionResponse> getAllPositions() {
-        return positionMapper.toPositionResponseList(positionRepository.findAll());
+    public List<PositionResponse> getAllPositions(Integer page, Integer size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Position> positionPage = positionRepository.findAll(pageable);
+
+        List<Position> positionList = positionPage.getContent();
+
+        return positionMapper.toPositionResponseList(positionList);
     }
 
     @Override

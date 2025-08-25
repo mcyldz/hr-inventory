@@ -11,7 +11,7 @@ public interface RoleService {
 
     RoleResponse getRoleById(UUID id);
 
-    List<RoleResponse> getAllRoles();
+    List<RoleResponse> getAllRoles(Integer page, Integer size);
 
     RoleResponse createRole(RoleCreateRequest request);
 

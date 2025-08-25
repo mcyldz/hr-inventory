@@ -9,6 +9,9 @@ import com.mcyldz.hrinventory.exception.model.ResourceNotFoundException;
 import com.mcyldz.hrinventory.mapper.DepartmentMapper;
 import com.mcyldz.hrinventory.repository.DepartmentRepository;
 import com.mcyldz.hrinventory.service.DepartmentService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,9 +38,15 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<DepartmentResponse> getAllDepartments() {
+    public List<DepartmentResponse> getAllDepartments(Integer page, Integer size) {
 
-        return departmentMapper.toDepartmentResponseList(departmentRepository.findAll());
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Department> departmentPage = departmentRepository.findAll(pageable);
+
+        List<Department> departmentList = departmentPage.getContent();
+
+        return departmentMapper.toDepartmentResponseList(departmentList);
     }
 
     @Override

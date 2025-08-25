@@ -10,6 +10,9 @@ import com.mcyldz.hrinventory.exception.model.ResourceNotFoundException;
 import com.mcyldz.hrinventory.mapper.RoleMapper;
 import com.mcyldz.hrinventory.repository.RoleRepository;
 import com.mcyldz.hrinventory.service.RoleService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,10 +41,15 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<RoleResponse> getAllRoles() {
+    public List<RoleResponse> getAllRoles(Integer page, Integer size) {
 
-        List<Role> roles = roleRepository.findAll();
-        return roleMapper.toRoleResponseList(roles);
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Role> rolePage = roleRepository.findAll(pageable);
+
+        List<Role> roleList = rolePage.getContent();
+
+        return roleMapper.toRoleResponseList(roleList);
     }
 
     @Override

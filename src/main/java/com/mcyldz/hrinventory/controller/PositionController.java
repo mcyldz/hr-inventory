@@ -33,8 +33,11 @@ public class PositionController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<List<PositionResponse>>> getAllPositions() {
-        List<PositionResponse> positions = positionService.getAllPositions();
+    public ResponseEntity<ApiResponse<List<PositionResponse>>> getAllPositions(
+            @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
+            @RequestParam(name = "size", required = false, defaultValue = "20") Integer size
+    ) {
+        List<PositionResponse> positions = positionService.getAllPositions(page, size);
         return ResponseEntity.ok(ApiResponse.success("All positions retrieved successfully", positions));
     }
 

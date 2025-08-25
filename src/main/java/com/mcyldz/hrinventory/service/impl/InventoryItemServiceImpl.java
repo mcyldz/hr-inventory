@@ -18,6 +18,9 @@ import com.mcyldz.hrinventory.repository.InventoryStatusHistoryRepository;
 import com.mcyldz.hrinventory.repository.InventoryStatusRepository;
 import com.mcyldz.hrinventory.repository.InventoryTypeRepository;
 import com.mcyldz.hrinventory.service.InventoryItemService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,8 +62,14 @@ public class InventoryItemServiceImpl implements InventoryItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<InventoryItemResponse> getAllInventoryItems() {
-        List<InventoryItem> inventoryItems = inventoryItemRepository.findAll();
+    public List<InventoryItemResponse> getAllInventoryItems(Integer page, Integer size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<InventoryItem> inventoryItemPage = inventoryItemRepository.findAll(pageable);
+
+        List<InventoryItem> inventoryItems = inventoryItemPage.getContent();
+
         return inventoryItemMapper.toInventoryItemResponseList(inventoryItems);
     }
 

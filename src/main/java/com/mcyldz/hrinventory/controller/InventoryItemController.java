@@ -34,8 +34,11 @@ public class InventoryItemController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_MANAGER')")
-    public ResponseEntity<ApiResponse<List<InventoryItemResponse>>> getAllInventoryItems(){
-        List<InventoryItemResponse> inventoryItemResponses = inventoryItemService.getAllInventoryItems();
+    public ResponseEntity<ApiResponse<List<InventoryItemResponse>>> getAllInventoryItems(
+            @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
+            @RequestParam(name = "size", required = false, defaultValue = "20") Integer size
+    ){
+        List<InventoryItemResponse> inventoryItemResponses = inventoryItemService.getAllInventoryItems(page, size);
         return ResponseEntity.ok(ApiResponse.success("All inventory items retrieved successfully", inventoryItemResponses));
     }
 

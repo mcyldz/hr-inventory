@@ -11,7 +11,7 @@ public interface PositionService {
 
     PositionResponse getPositionById(UUID id);
 
-    List<PositionResponse> getAllPositions();
+    List<PositionResponse> getAllPositions(Integer page, Integer size);
 
     PositionResponse createPosition(PositionCreateRequest request);
 

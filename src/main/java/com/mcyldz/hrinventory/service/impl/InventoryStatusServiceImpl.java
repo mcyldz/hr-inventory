@@ -10,6 +10,9 @@ import com.mcyldz.hrinventory.exception.model.ResourceNotFoundException;
 import com.mcyldz.hrinventory.mapper.InventoryStatusMapper;
 import com.mcyldz.hrinventory.repository.InventoryStatusRepository;
 import com.mcyldz.hrinventory.service.InventoryStatusService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,8 +39,15 @@ public class InventoryStatusServiceImpl implements InventoryStatusService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<InventoryStatusResponse> getAllStatuses() {
-        return inventoryStatusMapper.toInventoryStatusResponseList(inventoryStatusRepository.findAll());
+    public List<InventoryStatusResponse> getAllStatuses(Integer page, Integer size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<InventoryStatus> inventoryStatusPage = inventoryStatusRepository.findAll(pageable);
+
+        List<InventoryStatus> inventoryStatusList = inventoryStatusPage.getContent();
+
+        return inventoryStatusMapper.toInventoryStatusResponseList(inventoryStatusList);
     }
 
     @Override

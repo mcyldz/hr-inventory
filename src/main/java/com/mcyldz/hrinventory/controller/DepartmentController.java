@@ -26,8 +26,11 @@ public class DepartmentController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<List<DepartmentResponse>>> getAllDepartments() {
-        List<DepartmentResponse> departments = departmentService.getAllDepartments();
+    public ResponseEntity<ApiResponse<List<DepartmentResponse>>> getAllDepartments(
+            @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
+            @RequestParam(name = "size", required = false, defaultValue = "20") Integer size
+    ) {
+        List<DepartmentResponse> departments = departmentService.getAllDepartments(page, size);
         return ResponseEntity.ok(ApiResponse.success("All departments retrieved successfully", departments));
     }
 

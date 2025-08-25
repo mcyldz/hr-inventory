@@ -27,8 +27,11 @@ public class PersonnelController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'HR')")
-    public ResponseEntity<ApiResponse<List<PersonnelResponse>>> getAllPersonnel() {
-        List<PersonnelResponse> personnelList = personnelService.getAllPersonnel();
+    public ResponseEntity<ApiResponse<List<PersonnelResponse>>> getAllPersonnel(
+            @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
+            @RequestParam(name = "size", required = false, defaultValue = "20") Integer size
+    ) {
+        List<PersonnelResponse> personnelList = personnelService.getAllPersonnel(page, size);
         return ResponseEntity.ok(ApiResponse.success("All personnel retrieved successfully", personnelList));
     }
 

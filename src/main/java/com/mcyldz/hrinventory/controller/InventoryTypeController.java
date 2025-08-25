@@ -33,8 +33,11 @@ public class InventoryTypeController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<List<InventoryTypeResponse>>> getAllTypes() {
-        List<InventoryTypeResponse> types = inventoryTypeService.getAllTypes();
+    public ResponseEntity<ApiResponse<List<InventoryTypeResponse>>> getAllTypes(
+            @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
+            @RequestParam(name = "size", required = false, defaultValue = "20") Integer size
+    ) {
+        List<InventoryTypeResponse> types = inventoryTypeService.getAllTypes(page, size);
         return ResponseEntity.ok(ApiResponse.success("All inventory types retrieved successfully", types));
     }
 
