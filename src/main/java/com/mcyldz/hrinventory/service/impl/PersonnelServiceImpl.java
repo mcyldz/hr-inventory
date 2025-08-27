@@ -103,7 +103,7 @@ public class PersonnelServiceImpl implements PersonnelService {
         personnel.setRegistryNumber(generateUniqueRegistryNumber());
         Personnel savedPersonnel = personnelRepository.save(personnel);
 
-        createEmploymentHistory(savedPersonnel);
+        createEmploymentHistory(savedPersonnel, request.getStartDate());
 
         return personnelMapper.toPersonnelResponse(savedPersonnel);
     }
@@ -205,12 +205,16 @@ public class PersonnelServiceImpl implements PersonnelService {
         return registeryNumber;
     }
 
-    private void createEmploymentHistory(Personnel personnel){
+    private void createEmploymentHistory(Personnel personnel, LocalDate startDate){
         PersonnelEmploymentHistory employmentHistory = new PersonnelEmploymentHistory();
         employmentHistory.setPersonnel(personnel);
         employmentHistory.setDepartment(personnel.getDepartment());
         employmentHistory.setPosition(personnel.getPosition());
-        employmentHistory.setStartDate(LocalDate.now());
+        employmentHistory.setStartDate(startDate);
         historyRepository.save(employmentHistory);
+    }
+
+    private void createEmploymentHistory(Personnel personnel){
+        this.createEmploymentHistory(personnel, LocalDate.now());
     }
 }

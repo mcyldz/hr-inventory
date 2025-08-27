@@ -43,5 +43,7 @@ public class PersonnelCreateRequest {
 
     private UUID educationLevelId;
 
+    private LocalDate startDate;
+
     private String profilePhoto;
 }
