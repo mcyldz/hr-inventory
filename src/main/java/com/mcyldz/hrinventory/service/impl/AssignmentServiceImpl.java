@@ -13,6 +13,7 @@ import com.mcyldz.hrinventory.service.AssignmentService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -86,6 +87,7 @@ public class AssignmentServiceImpl implements AssignmentService {
             InventoryStatusHistory history = new InventoryStatusHistory();
             history.setInventoryItem(item);
             history.setStatus(statusInUse);
+            history.setChangeDate(LocalDateTime.now());
             history.setChangedBy(currentUser);
             inventoryStatusHistoryRepository.save(history);
 
@@ -130,6 +132,7 @@ public class AssignmentServiceImpl implements AssignmentService {
                 InventoryStatusHistory history = new InventoryStatusHistory();
                 history.setInventoryItem(item);
                 history.setStatus(statusInStock);
+                history.setChangeDate(LocalDateTime.now());
                 history.setChangedBy(currentUser);
                 inventoryStatusHistoryRepository.save(history);
             }
