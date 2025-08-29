@@ -14,6 +14,7 @@ import com.mcyldz.hrinventory.repository.PersonnelRepository;
 import com.mcyldz.hrinventory.repository.RoleRepository;
 import com.mcyldz.hrinventory.repository.UserRepository;
 import com.mcyldz.hrinventory.service.UserService;
+import com.mcyldz.hrinventory.util.SecurityUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -63,6 +64,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponse createUser(UserCreateRequest request) {
+
         userRepository.findByUsername(request.getUsername()).ifPresent(user -> {
             throw new DuplicateResourceException(ErrorCode.USERNAME_ALREADY_EXISTS);
         });
@@ -79,8 +81,13 @@ public class UserServiceImpl implements UserService {
         if (request.getPersonnelId() != null) {
             Personnel personnel = personnelRepository.findById(request.getPersonnelId())
                     .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.PERSONNEL_NOT_FOUND));
+
             user.setPersonnel(personnel);
         }
+
+        User currentUser = getCurrentUser();
+        user.setCreatedBy(currentUser.getId());
+        user.setLastModifiedBy(currentUser.getId());
 
         User savedUser = userRepository.save(user);
 
@@ -100,6 +107,9 @@ public class UserServiceImpl implements UserService {
 
         existingUser.setRole(role);
 
+        User currentUser = getCurrentUser();
+        existingUser.setLastModifiedBy(currentUser.getId());
+
         User updatedUser = userRepository.save(existingUser);
 
         return userMapper.toUserResponse(updatedUser);
@@ -116,6 +126,11 @@ public class UserServiceImpl implements UserService {
 
     private User findUserByIdOrThrow(UUID id) {
         return userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    private User getCurrentUser(){
+        return userRepository.findByUsername(SecurityUtils.getCurrentUsername())
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND));
     }
 }

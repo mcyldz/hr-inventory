@@ -10,6 +10,7 @@ import com.mcyldz.hrinventory.exception.model.ResourceNotFoundException;
 import com.mcyldz.hrinventory.mapper.AssignmentMapper;
 import com.mcyldz.hrinventory.repository.*;
 import com.mcyldz.hrinventory.service.AssignmentService;
+import com.mcyldz.hrinventory.util.SecurityUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,21 +46,22 @@ public class AssignmentServiceImpl implements AssignmentService {
     @Override
     @Transactional(readOnly = true)
     public List<AssignmentResponse> getAssignmentsByPersonnelId(UUID personnelId) {
+
         if (!personnelRepository.existsById(personnelId)) {
             throw new ResourceNotFoundException(ErrorCode.PERSONNEL_NOT_FOUND);
         }
 
         List<PersonnelInventoryAssignment> assignments = assignmentRepository.findByPersonnelIdAndReturnDateIsNull(personnelId);
+
         return assignmentMapper.toAssignmentResponseList(assignments);
     }
 
     @Override
     @Transactional
     public List<AssignmentResponse> createAssignments(AssignmentCreateRequest request) {
+
         Personnel personnel = personnelRepository.findById(request.getPersonnelId())
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.PERSONNEL_NOT_FOUND));
-
-        User currentUser = userRepository.findByUsername("admin").orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND));
 
         InventoryStatus statusInUse = inventoryStatusRepository.findByName(STATUS_IN_USE)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.INVENTORY_STATUS_NOT_FOUND));
@@ -74,11 +76,15 @@ public class AssignmentServiceImpl implements AssignmentService {
                 throw new BusinessLogicException(ErrorCode.INVENTORY_ITEM_ALREADY_ASSIGNED);
             }
 
+            User currentUser = getCurrentUser();
+
             PersonnelInventoryAssignment newAssignment = new PersonnelInventoryAssignment();
             newAssignment.setAssignedBy(currentUser);
             newAssignment.setAssignmentDate(request.getAssignmentDate());
             newAssignment.setPersonnel(personnel);
             newAssignment.setInventoryItem(item);
+            newAssignment.setCreatedBy(currentUser.getId());
+            newAssignment.setLastModifiedBy(currentUser.getId());
             newAssignment.setNotes(request.getNotes());
 
             item.setCurrentStatus(statusInUse);
@@ -89,6 +95,8 @@ public class AssignmentServiceImpl implements AssignmentService {
             history.setStatus(statusInUse);
             history.setChangeDate(LocalDateTime.now());
             history.setChangedBy(currentUser);
+            history.setCreatedBy(currentUser.getId());
+            history.setLastModifiedBy(currentUser.getId());
             inventoryStatusHistoryRepository.save(history);
 
             PersonnelInventoryAssignment savedAssignment = assignmentRepository.save(newAssignment);
@@ -106,9 +114,6 @@ public class AssignmentServiceImpl implements AssignmentService {
         InventoryStatus statusInStock = inventoryStatusRepository.findByName(STATUS_IN_STOCK)
                 .orElseThrow(() -> new IllegalStateException("Status 'DEPODA' not found in database."));
 
-        User currentUser = userRepository.findByUsername("admin")
-                .orElseThrow(() -> new IllegalStateException("Admin user not found for testing"));
-
         List<PersonnelInventoryAssignment> updatedAssignments = new ArrayList<>();
 
         for (UUID assignmentId  : request.getAssignmentIds()){
@@ -121,11 +126,15 @@ public class AssignmentServiceImpl implements AssignmentService {
                 continue;
             }
 
+            User currentUser = getCurrentUser();
+
             assignmentToReturn.setReturnDate(request.getReturnDate());
             assignmentToReturn.setReturnedBy(currentUser);
 
             InventoryItem item = assignmentToReturn.getInventoryItem();
+
             if (item != null) {
+
                 item.setCurrentStatus(statusInStock);
                 inventoryItemRepository.save(item);
 
@@ -134,11 +143,18 @@ public class AssignmentServiceImpl implements AssignmentService {
                 history.setStatus(statusInStock);
                 history.setChangeDate(LocalDateTime.now());
                 history.setChangedBy(currentUser);
+                history.setCreatedBy(currentUser.getId());
+                history.setLastModifiedBy(currentUser.getId());
                 inventoryStatusHistoryRepository.save(history);
             }
 
             updatedAssignments.add(assignmentRepository.save(assignmentToReturn));
         }
         return assignmentMapper.toAssignmentResponseList(updatedAssignments);
+    }
+
+    private User getCurrentUser(){
+        return userRepository.findByUsername(SecurityUtils.getCurrentUsername())
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND));
     }
 }

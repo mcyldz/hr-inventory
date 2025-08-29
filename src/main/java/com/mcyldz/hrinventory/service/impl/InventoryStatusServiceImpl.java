@@ -4,12 +4,15 @@ import com.mcyldz.hrinventory.dto.request.InventoryStatusCreateRequest;
 import com.mcyldz.hrinventory.dto.request.InventoryStatusUpdateRequest;
 import com.mcyldz.hrinventory.dto.response.InventoryStatusResponse;
 import com.mcyldz.hrinventory.entity.InventoryStatus;
+import com.mcyldz.hrinventory.entity.User;
 import com.mcyldz.hrinventory.exception.model.DuplicateResourceException;
 import com.mcyldz.hrinventory.exception.model.ErrorCode;
 import com.mcyldz.hrinventory.exception.model.ResourceNotFoundException;
 import com.mcyldz.hrinventory.mapper.InventoryStatusMapper;
 import com.mcyldz.hrinventory.repository.InventoryStatusRepository;
+import com.mcyldz.hrinventory.repository.UserRepository;
 import com.mcyldz.hrinventory.service.InventoryStatusService;
+import com.mcyldz.hrinventory.util.SecurityUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,9 +29,12 @@ public class InventoryStatusServiceImpl implements InventoryStatusService {
 
     private final InventoryStatusMapper inventoryStatusMapper;
 
-    public InventoryStatusServiceImpl(InventoryStatusRepository inventoryStatusRepository, InventoryStatusMapper inventoryStatusMapper) {
+    private final UserRepository userRepository;
+
+    public InventoryStatusServiceImpl(InventoryStatusRepository inventoryStatusRepository, InventoryStatusMapper inventoryStatusMapper, UserRepository userRepository) {
         this.inventoryStatusRepository = inventoryStatusRepository;
         this.inventoryStatusMapper = inventoryStatusMapper;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -58,14 +64,22 @@ public class InventoryStatusServiceImpl implements InventoryStatusService {
             throw new DuplicateResourceException(ErrorCode.INVENTORY_STATUS_NAME_ALREADY_EXISTS);
         });
 
+        User currentUser = getCurrentUser();
+
         InventoryStatus status = inventoryStatusMapper.toInventoryStatus(request);
+
+        status.setCreatedBy(currentUser.getId());
+        status.setLastModifiedBy(currentUser.getId());
+
         InventoryStatus savedStatus = inventoryStatusRepository.save(status);
+
         return inventoryStatusMapper.toInventoryStatusResponse(savedStatus);
     }
 
     @Override
     @Transactional
     public InventoryStatusResponse updateStatus(UUID id, InventoryStatusUpdateRequest request) {
+
         InventoryStatus existingStatus = findStatusByIdOrThrow(id);
 
         inventoryStatusRepository.findByName(request.getName()).ifPresent(foundStatus -> {
@@ -74,8 +88,13 @@ public class InventoryStatusServiceImpl implements InventoryStatusService {
             }
         });
 
+        User currentUser = getCurrentUser();
+
         inventoryStatusMapper.updateInventoryStatusFromRequest(request, existingStatus);
+
+        existingStatus.setLastModifiedBy(currentUser.getId());
         InventoryStatus updatedStatus = inventoryStatusRepository.save(existingStatus);
+
         return inventoryStatusMapper.toInventoryStatusResponse(updatedStatus);
     }
 
@@ -91,5 +110,10 @@ public class InventoryStatusServiceImpl implements InventoryStatusService {
     private InventoryStatus findStatusByIdOrThrow(UUID id) {
         return inventoryStatusRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.INVENTORY_STATUS_NOT_FOUND));
+    }
+
+    private User getCurrentUser(){
+        return userRepository.findByUsername(SecurityUtils.getCurrentUsername())
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND));
     }
 }

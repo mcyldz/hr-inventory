@@ -13,6 +13,7 @@ import com.mcyldz.hrinventory.mapper.PersonnelEmploymentHistoryMapper;
 import com.mcyldz.hrinventory.mapper.PersonnelMapper;
 import com.mcyldz.hrinventory.repository.*;
 import com.mcyldz.hrinventory.service.PersonnelService;
+import com.mcyldz.hrinventory.util.SecurityUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -43,7 +44,9 @@ public class PersonnelServiceImpl implements PersonnelService {
 
     private final PersonnelInventoryAssignmentRepository assignmentRepository;
 
-    public PersonnelServiceImpl(PersonnelRepository personnelRepository, EducationLevelRepository educationLevelRepository, DepartmentRepository departmentRepository, PositionRepository positionRepository, PersonnelEmploymentHistoryRepository historyRepository, PersonnelMapper personnelMapper, PersonnelEmploymentHistoryMapper historyMapper, PersonnelInventoryAssignmentRepository assignmentRepository) {
+    private final UserRepository userRepository;
+
+    public PersonnelServiceImpl(PersonnelRepository personnelRepository, EducationLevelRepository educationLevelRepository, DepartmentRepository departmentRepository, PositionRepository positionRepository, PersonnelEmploymentHistoryRepository historyRepository, PersonnelMapper personnelMapper, PersonnelEmploymentHistoryMapper historyMapper, PersonnelInventoryAssignmentRepository assignmentRepository, UserRepository userRepository) {
         this.personnelRepository = personnelRepository;
         this.educationLevelRepository = educationLevelRepository;
         this.departmentRepository = departmentRepository;
@@ -52,6 +55,7 @@ public class PersonnelServiceImpl implements PersonnelService {
         this.personnelMapper = personnelMapper;
         this.historyMapper = historyMapper;
         this.assignmentRepository = assignmentRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -90,6 +94,8 @@ public class PersonnelServiceImpl implements PersonnelService {
         Position position = positionRepository.findById(request.getPositionId())
                 .orElseThrow(()->new ResourceNotFoundException(ErrorCode.POSITION_NOT_FOUND, "Position not found with id: " + request.getPositionId()));
 
+        User currentUser = getCurrentUser();
+
         personnel.setDepartment(department);
         personnel.setPosition(position);
 
@@ -101,6 +107,8 @@ public class PersonnelServiceImpl implements PersonnelService {
         }
 
         personnel.setRegistryNumber(generateUniqueRegistryNumber());
+        personnel.setCreatedBy(currentUser.getId());
+        personnel.setLastModifiedBy(currentUser.getId());
         Personnel savedPersonnel = personnelRepository.save(personnel);
 
         createEmploymentHistory(savedPersonnel, request.getStartDate());
@@ -126,6 +134,8 @@ public class PersonnelServiceImpl implements PersonnelService {
         Position position = positionRepository.findById(request.getPositionId())
                 .orElseThrow(()->new ResourceNotFoundException(ErrorCode.POSITION_NOT_FOUND, "Position not found with id: " + request.getPositionId()));
 
+        User currentUser = getCurrentUser();
+
         existPersonnel.setDepartment(department);
         existPersonnel.setPosition(position);
 
@@ -143,6 +153,7 @@ public class PersonnelServiceImpl implements PersonnelService {
                     .orElseThrow(()->new ResourceNotFoundException(ErrorCode.RESOURCE_NOT_FOUND));
 
             employmentHistory.setEndDate(LocalDate.now());
+            employmentHistory.setLastModifiedBy(currentUser.getId());
             historyRepository.save(employmentHistory);
 
             createEmploymentHistory(existPersonnel);
@@ -159,9 +170,11 @@ public class PersonnelServiceImpl implements PersonnelService {
 
             employmentHistory.setEndDate(LocalDate.now());
             employmentHistory.setTerminationReason(request.getTerminationReason());
+            employmentHistory.setLastModifiedBy(currentUser.getId());
             historyRepository.save(employmentHistory);
         }
 
+        existPersonnel.setLastModifiedBy(currentUser.getId());
         Personnel updatedPersonnel = personnelRepository.save(existPersonnel);
 
         return personnelMapper.toPersonnelResponse(updatedPersonnel);
@@ -179,6 +192,7 @@ public class PersonnelServiceImpl implements PersonnelService {
     @Override
     @Transactional(readOnly = true)
     public List<PersonnelEmploymentHistoryResponse> getEmploymentHistory(UUID personnelId) {
+
         if (!personnelRepository.existsById(personnelId)) {
             throw new ResourceNotFoundException(ErrorCode.PERSONNEL_NOT_FOUND);
         }
@@ -199,22 +213,35 @@ public class PersonnelServiceImpl implements PersonnelService {
         Integer registeryNumber;
 
         do {
-            registeryNumber =ThreadLocalRandom.current().nextInt(min, max);
+            registeryNumber = ThreadLocalRandom.current().nextInt(min, max);
         } while (personnelRepository.existsByRegistryNumber(registeryNumber));
 
         return registeryNumber;
     }
 
     private void createEmploymentHistory(Personnel personnel, LocalDate startDate){
+
+        User currentUser = getCurrentUser();
+
         PersonnelEmploymentHistory employmentHistory = new PersonnelEmploymentHistory();
+
         employmentHistory.setPersonnel(personnel);
         employmentHistory.setDepartment(personnel.getDepartment());
         employmentHistory.setPosition(personnel.getPosition());
         employmentHistory.setStartDate(startDate);
+
+        employmentHistory.setCreatedBy(currentUser.getId());
+        employmentHistory.setLastModifiedBy(currentUser.getId());
+
         historyRepository.save(employmentHistory);
     }
 
     private void createEmploymentHistory(Personnel personnel){
         this.createEmploymentHistory(personnel, LocalDate.now());
+    }
+
+    private User getCurrentUser(){
+        return userRepository.findByUsername(SecurityUtils.getCurrentUsername())
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND));
     }
 }

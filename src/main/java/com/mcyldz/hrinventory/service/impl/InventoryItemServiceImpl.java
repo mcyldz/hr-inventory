@@ -4,20 +4,15 @@ import com.mcyldz.hrinventory.dto.request.InventoryCreateRequest;
 import com.mcyldz.hrinventory.dto.request.InventoryUpdateRequest;
 import com.mcyldz.hrinventory.dto.response.InventoryItemResponse;
 import com.mcyldz.hrinventory.dto.response.InventoryStatusHistoryResponse;
-import com.mcyldz.hrinventory.entity.InventoryItem;
-import com.mcyldz.hrinventory.entity.InventoryStatus;
-import com.mcyldz.hrinventory.entity.InventoryStatusHistory;
-import com.mcyldz.hrinventory.entity.InventoryType;
+import com.mcyldz.hrinventory.entity.*;
 import com.mcyldz.hrinventory.exception.model.DuplicateResourceException;
 import com.mcyldz.hrinventory.exception.model.ErrorCode;
 import com.mcyldz.hrinventory.exception.model.ResourceNotFoundException;
 import com.mcyldz.hrinventory.mapper.InventoryItemMapper;
 import com.mcyldz.hrinventory.mapper.InventoryStatusHistoryMapper;
-import com.mcyldz.hrinventory.repository.InventoryItemRepository;
-import com.mcyldz.hrinventory.repository.InventoryStatusHistoryRepository;
-import com.mcyldz.hrinventory.repository.InventoryStatusRepository;
-import com.mcyldz.hrinventory.repository.InventoryTypeRepository;
+import com.mcyldz.hrinventory.repository.*;
 import com.mcyldz.hrinventory.service.InventoryItemService;
+import com.mcyldz.hrinventory.util.SecurityUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -42,15 +37,19 @@ public class InventoryItemServiceImpl implements InventoryItemService {
 
     private final InventoryStatusHistoryMapper inventoryStatusHistoryMapper;
 
+    private final UserRepository userRepository;
+
+
     private final static String DEFAULT_STATUS_NAME = "DEPODA";
 
-    public InventoryItemServiceImpl(InventoryItemRepository inventoryItemRepository, InventoryTypeRepository inventoryTypeRepository, InventoryStatusRepository inventoryStatusRepository, InventoryStatusHistoryRepository inventoryStatusHistoryRepository, InventoryItemMapper inventoryItemMapper, InventoryStatusHistoryMapper inventoryStatusHistoryMapper) {
+    public InventoryItemServiceImpl(InventoryItemRepository inventoryItemRepository, InventoryTypeRepository inventoryTypeRepository, InventoryStatusRepository inventoryStatusRepository, InventoryStatusHistoryRepository inventoryStatusHistoryRepository, InventoryItemMapper inventoryItemMapper, InventoryStatusHistoryMapper inventoryStatusHistoryMapper, UserRepository userRepository) {
         this.inventoryItemRepository = inventoryItemRepository;
         this.inventoryTypeRepository = inventoryTypeRepository;
         this.inventoryStatusRepository = inventoryStatusRepository;
         this.inventoryStatusHistoryRepository = inventoryStatusHistoryRepository;
         this.inventoryItemMapper = inventoryItemMapper;
         this.inventoryStatusHistoryMapper = inventoryStatusHistoryMapper;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -90,7 +89,11 @@ public class InventoryItemServiceImpl implements InventoryItemService {
 
         InventoryStatus defaultStatus = inventoryStatusRepository.findByName(DEFAULT_STATUS_NAME).orElseThrow(()-> new ResourceNotFoundException(ErrorCode.INVENTORY_STATUS_NOT_FOUND, "Default status 'DEPODA' not found in database."));
 
+        User currentUser = getCurrentUser();
+
         inventoryItem.setCurrentStatus(defaultStatus);
+        inventoryItem.setCreatedBy(currentUser.getId());
+        inventoryItem.setLastModifiedBy(currentUser.getId());
 
         InventoryItem savedInventoryItem = inventoryItemRepository.save(inventoryItem);
 
@@ -111,8 +114,11 @@ public class InventoryItemServiceImpl implements InventoryItemService {
         InventoryStatus status = inventoryStatusRepository
                 .findById(request.getCurrentStatusId()).orElseThrow(()-> new ResourceNotFoundException(ErrorCode.INVENTORY_STATUS_NOT_FOUND));
 
+        User currentUser = getCurrentUser();
+
         inventoryItem.setInventoryType(inventoryType);
         inventoryItem.setCurrentStatus(status);
+        inventoryItem.setLastModifiedBy(currentUser.getId());
 
         InventoryItem updatedItem = inventoryItemRepository.save(inventoryItem);
 
@@ -143,5 +149,10 @@ public class InventoryItemServiceImpl implements InventoryItemService {
     private InventoryItem findInventoryItemByIdOrThrow(UUID id){
         return inventoryItemRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException(ErrorCode.INVENTORY_ITEM_NOT_FOUND));
+    }
+
+    private User getCurrentUser(){
+        return userRepository.findByUsername(SecurityUtils.getCurrentUsername())
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND));
     }
 }
