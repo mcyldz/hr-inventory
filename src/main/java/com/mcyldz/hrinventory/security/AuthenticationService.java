@@ -48,6 +48,9 @@ public class AuthenticationService {
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
         User user = userRepository.findByUsername(request.getUsername()).orElseThrow();
 
+        user.setLastLogin(LocalDateTime.now());
+        userRepository.save(user);
+
         String accessToken = jwtService.generateToken(userDetails);
         String refreshToken = createRefreshTokenForUser(user);
 
