@@ -18,7 +18,7 @@ public class UserResponse {
 
     private String username;
 
-    private boolean isActive;
+    private Boolean isActive;
 
     private LocalDateTime lastLogin;
 
