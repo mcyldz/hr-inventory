@@ -18,6 +18,6 @@ public interface HelperMapper {
         if (inventoryItem == null){
             return null;
         }
-        return "Brand: " + inventoryItem.getBrand() + " Model:" + inventoryItem.getModel() + " Serial Number: " + inventoryItem.getSerialNumber();
+        return inventoryItem.getBrand() + " " + inventoryItem.getModel() + " - " + inventoryItem.getSerialNumber();
     }
 }
