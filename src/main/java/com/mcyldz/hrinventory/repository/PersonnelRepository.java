@@ -11,6 +11,4 @@ import java.util.UUID;
 public interface PersonnelRepository extends JpaRepository<Personnel, UUID> {
 
     Optional<Personnel> findByTcIdentityNumber(String tcIdentityNumber);
-
-    boolean existsByRegistryNumber(Integer registeryNumber);
 }

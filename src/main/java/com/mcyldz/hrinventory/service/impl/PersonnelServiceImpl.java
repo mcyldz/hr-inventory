@@ -106,7 +106,6 @@ public class PersonnelServiceImpl implements PersonnelService {
             personnel.setEducationLevel(educationLevel);
         }
 
-        personnel.setRegistryNumber(generateUniqueRegistryNumber());
         personnel.setCreatedBy(currentUser.getId());
         personnel.setLastModifiedBy(currentUser.getId());
         Personnel savedPersonnel = personnelRepository.save(personnel);
@@ -206,18 +205,6 @@ public class PersonnelServiceImpl implements PersonnelService {
                 .orElseThrow(()->new ResourceNotFoundException(ErrorCode.PERSONNEL_NOT_FOUND));
     }
 
-    private Integer generateUniqueRegistryNumber(){
-        int min = 1_000_000;
-        int max = 10_000_000;
-
-        Integer registeryNumber;
-
-        do {
-            registeryNumber = ThreadLocalRandom.current().nextInt(min, max);
-        } while (personnelRepository.existsByRegistryNumber(registeryNumber));
-
-        return registeryNumber;
-    }
 
     private void createEmploymentHistory(Personnel personnel, LocalDate startDate){
 
