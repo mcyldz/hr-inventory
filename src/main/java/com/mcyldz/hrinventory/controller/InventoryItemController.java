@@ -33,7 +33,7 @@ public class InventoryItemController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_MANAGER', 'HR')")
     public ResponseEntity<ApiResponse<List<InventoryItemResponse>>> getAllInventoryItems(
             @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
             @RequestParam(name = "size", required = false, defaultValue = "20") Integer size
