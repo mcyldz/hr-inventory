@@ -27,7 +27,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(
                 ex.getStatus().value(),
                 ex.getStatus().getReasonPhrase(),
-                ex.getErrorCode().getCode(),
+                ex.getErrorCode().name(),
                 ex.getMessage(),
                 ((ServletWebRequest) request).getRequest().getRequestURI()
         );
